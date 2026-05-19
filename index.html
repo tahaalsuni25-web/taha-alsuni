@@ -1,1 +1,1798 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شركة طه السني لتأجير السيارات</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #f4f6fa; color: #222; direction: rtl; }
 
+  header { background: #1a3c6e; color: #fff; padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { font-size: 22px; font-weight: 600; }
+  header span { font-size: 14px; opacity: 0.8; }
+
+  nav { background: #fff; border-bottom: 1px solid #dde3ef; display: flex; gap: 0; }
+  nav button { padding: 14px 18px; border: none; background: none; cursor: pointer; font-size: 13px; color: #555; border-bottom: 3px solid transparent; transition: all .2s; font-family: inherit; }
+  nav button.active, nav button:hover { color: #1a3c6e; border-bottom-color: #1a3c6e; background: #f0f4ff; }
+  .badge.debt { background: #fff0e0; color: #b35c00; }
+
+  .page { display: none; padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .metric-card { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid #e0e6f0; }
+  .metric-card .label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .metric-card .value { font-size: 26px; font-weight: 600; color: #1a3c6e; }
+  .metric-card .sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+  .metric-card.green .value { color: #1a7a4a; }
+  .metric-card.red .value { color: #c0392b; }
+  .metric-card.orange .value { color: #d35400; }
+
+  .section-title { font-size: 16px; font-weight: 600; color: #1a3c6e; margin: 24px 0 14px; border-right: 4px solid #1a3c6e; padding-right: 10px; }
+
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #e0e6f0; }
+  th { background: #1a3c6e; color: #fff; padding: 10px 12px; font-size: 13px; font-weight: 500; text-align: center; }
+  td { padding: 9px 12px; font-size: 13px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+  tr:hover td { background: #f7f9ff; }
+  tr:last-child td { border-bottom: none; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.rented { background: #e8f5e9; color: #2e7d32; }
+  .badge.office { background: #fff3e0; color: #e65100; }
+  .badge.repair { background: #fce4ec; color: #c62828; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 13px; color: #555; font-weight: 500; }
+  .form-group input, .form-group select { border: 1px solid #cdd4e0; border-radius: 6px; padding: 9px 12px; font-size: 14px; font-family: inherit; outline: none; transition: border .2s; }
+  .form-group input:focus, .form-group select:focus { border-color: #1a3c6e; }
+
+  .btn { padding: 10px 22px; border-radius: 7px; border: none; cursor: pointer; font-size: 14px; font-family: inherit; font-weight: 500; transition: all .18s; }
+  .btn-primary { background: #1a3c6e; color: #fff; }
+  .btn-primary:hover { background: #15305a; }
+  .btn-success { background: #1a7a4a; color: #fff; }
+  .btn-success:hover { background: #155c38; }
+  .btn-danger { background: #c0392b; color: #fff; }
+  .btn-danger:hover { background: #962d22; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  .form-card { background: #fff; border-radius: 10px; padding: 24px; border: 1px solid #e0e6f0; margin-bottom: 20px; }
+  .form-actions { margin-top: 20px; display: flex; gap: 10px; }
+
+  .summary-box { background: #f0f4ff; border: 1px solid #c5d0f0; border-radius: 8px; padding: 14px 18px; margin-top: 14px; }
+  .summary-box .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; }
+  .summary-box .row.total { font-weight: 600; font-size: 16px; border-top: 1px solid #c5d0f0; margin-top: 8px; padding-top: 8px; }
+
+  .expense-types { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .expense-type-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #1a3c6e; background: transparent; color: #1a3c6e; cursor: pointer; font-size: 13px; font-family: inherit; transition: all .18s; }
+  .expense-type-btn.selected { background: #1a3c6e; color: #fff; }
+
+  .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
+  .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .alert-warning { background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .table-wrap { overflow-x: auto; }
+
+  #calc-result { background: #e8f0ff; border: 1px solid #b0c4f0; border-radius: 8px; padding: 16px; margin-top: 16px; display: none; }
+  #calc-result .big { font-size: 24px; font-weight: 700; color: #1a3c6e; }
+
+  .car-status-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .car-chip { background: #fff; border: 1.5px solid #dde3ef; border-radius: 8px; padding: 10px 16px; font-size: 13px; min-width: 130px; }
+  .car-chip .car-name { font-weight: 600; color: #1a3c6e; }
+  .car-chip .car-plate { color: #888; font-size: 11px; }
+  .car-chip .car-st { margin-top: 4px; }
+
+  .id-upload-box { border: 2px dashed #c5d0f0; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; transition: all .2s; background: #f8faff; }
+  .id-upload-box:hover { border-color: #1a3c6e; background: #eef2ff; }
+  .id-upload-box img { max-width: 100%; max-height: 160px; border-radius: 6px; margin-top: 8px; display: none; }
+  .id-upload-box.has-img img { display: block; }
+  .id-upload-box .upload-label { font-size: 13px; color: #888; }
+  .id-upload-box.has-img .upload-label { font-size: 11px; color: #aaa; }
+
+  .daily-report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 14px 0; }
+  .daily-stat { background: #fff; border-radius: 8px; padding: 12px 16px; border: 1px solid #e0e6f0; text-align: center; }
+  .daily-stat .ds-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .daily-stat .ds-value { font-size: 20px; font-weight: 700; color: #1a3c6e; }
+  .daily-stat.green .ds-value { color: #1a7a4a; }
+  .daily-stat.red .ds-value { color: #c0392b; }
+
+  .terminate-btn { background: #7b1fa2; color: #fff; }
+  .terminate-btn:hover { background: #6a1991; }
+
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 9999; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: #fff; border-radius: 12px; padding: 28px; max-width: 480px; width: 95%; box-shadow: 0 8px 40px rgba(0,0,0,.25); }
+  .modal-box h3 { font-size: 16px; font-weight: 600; color: #1a3c6e; margin-bottom: 16px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end; }
+
+  /* Loading overlay */
+  #loading-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(26,60,110,0.92);
+    z-index: 99999; align-items: center; justify-content: center; flex-direction: column; gap: 20px;
+  }
+  #loading-overlay .spin {
+    width: 52px; height: 52px; border: 5px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%; animation: spin 0.9s linear infinite;
+  }
+  #loading-overlay p { color: #fff; font-size: 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media print {
+    nav, .form-card, .btn { display: none; }
+    .page { display: block !important; padding: 0; }
+  }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 768px) {
+    header { padding: 12px 16px; }
+    header h1 { font-size: 15px; }
+    header span { display: none; }
+
+    /* شريط تنقل سفلي للجوال */
+    nav { display: none; }
+    .mobile-nav {
+      display: flex;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid #dde3ef;
+      z-index: 1000;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .mobile-nav::-webkit-scrollbar { display: none; }
+    .mobile-nav button {
+      flex: 0 0 auto;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 8px 14px 6px;
+      border: none; background: none; cursor: pointer;
+      font-size: 10px; color: #888; font-family: inherit;
+      white-space: nowrap; gap: 3px;
+      border-top: 2px solid transparent; transition: all .2s;
+    }
+    .mobile-nav button .mn-icon { font-size: 18px; }
+    .mobile-nav button.active { color: #1a3c6e; border-top-color: #1a3c6e; background: #f0f4ff; }
+
+    .page { padding: 14px 12px 90px; }
+
+    /* بطاقات لوحة التحكم */
+    .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .metric-card { padding: 12px 10px; }
+    .metric-card .value { font-size: 20px; }
+    .metric-card .label { font-size: 11px; }
+
+    .two-col { grid-template-columns: 1fr; gap: 14px; }
+
+    /* نموذج */
+    .form-grid { grid-template-columns: 1fr; gap: 12px; }
+    .form-card { padding: 14px; }
+    .form-actions { flex-wrap: wrap; }
+    .btn { width: 100%; text-align: center; }
+    .form-actions .btn { width: auto; flex: 1; }
+
+    /* جداول — تمرير أفقي */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 600px; font-size: 12px; }
+    th, td { padding: 7px 8px; }
+
+    /* عنوان القسم */
+    .section-title { font-size: 14px; margin: 16px 0 10px; }
+
+    /* بطاقات يومية */
+    .daily-report-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .daily-stat .ds-value { font-size: 17px; }
+
+    /* مودال */
+    .modal-box { padding: 18px 14px; }
+    .modal-actions { flex-direction: column; }
+    .modal-actions .btn { width: 100%; }
+
+    /* حاسبة */
+    #calc-result .big { font-size: 18px; }
+
+    /* شرائح السيارات */
+    .car-status-row { gap: 8px; }
+    .car-chip { min-width: 100px; padding: 8px 10px; font-size: 12px; }
+
+    /* زر الإنهاء صغير */
+    .terminate-btn { font-size: 11px; padding: 4px 8px; }
+  }
+
+  @media (min-width: 769px) {
+    .mobile-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+<!-- شاشة التحميل -->
+<div id="loading-overlay">
+  <div class="spin"></div>
+  <p>جارٍ الاتصال بقاعدة البيانات...</p>
+</div>
+  <h1>🚗 شركة طه السني لتأجير السيارات</h1>
+  <span id="header-date"></span>
+</header>
+
+<nav>
+  <button class="active" onclick="showPage('dashboard')">لوحة التحكم</button>
+  <button onclick="showPage('contracts')">العقود اليومية</button>
+  <button onclick="showPage('new-contract')">عقد جديد</button>
+  <button onclick="showPage('daily-report')">الإيراد اليومي</button>
+  <button onclick="showPage('expenses')">المصروفات</button>
+  <button onclick="showPage('cars')">السيارات</button>
+  <button onclick="showPage('debts')">المديونيات</button>
+  <button onclick="showPage('calculator')">حاسبة الأجرة</button>
+  <button onclick="showPage('reports')">التقارير</button>
+</nav>
+
+<!-- شريط التنقل السفلي للجوال -->
+<div class="mobile-nav">
+  <button class="active" onclick="showPage('dashboard')"><span class="mn-icon">🏠</span>الرئيسية</button>
+  <button onclick="showPage('new-contract')"><span class="mn-icon">➕</span>عقد جديد</button>
+  <button onclick="showPage('contracts')"><span class="mn-icon">📋</span>العقود</button>
+  <button onclick="showPage('daily-report')"><span class="mn-icon">📊</span>اليومي</button>
+  <button onclick="showPage('expenses')"><span class="mn-icon">💸</span>المصروفات</button>
+  <button onclick="showPage('cars')"><span class="mn-icon">🚗</span>السيارات</button>
+  <button onclick="showPage('debts')"><span class="mn-icon">⚠️</span>المديونيات</button>
+  <button onclick="showPage('calculator')"><span class="mn-icon">🧮</span>الحاسبة</button>
+  <button onclick="showPage('reports')"><span class="mn-icon">📈</span>التقارير</button>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="cards-grid">
+    <div class="metric-card green">
+      <div class="label">إجمالي الإيرادات</div>
+      <div class="value" id="d-revenue">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card" style="border-right:4px solid #1a7a4a;">
+      <div class="label">إيرادات يدوية (مستقلة)</div>
+      <div class="value" id="d-manual-income" style="color:#1a7a4a;">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card red">
+      <div class="label">إجمالي المصروفات</div>
+      <div class="value" id="d-expenses">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">صافي الربح</div>
+      <div class="value" id="d-profit">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card orange">
+      <div class="label">المبالغ المتبقية (الكل)</div>
+      <div class="value" id="d-pending">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card" style="border-right:4px solid #c0392b;">
+      <div class="label">متبقي عقود نشطة</div>
+      <div class="value" id="d-active-pending" style="color:#c0392b;">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">عقود نشطة</div>
+      <div class="value" id="d-active">0</div>
+      <div class="sub">عقد حالي</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">سيارات بالمكتب</div>
+      <div class="value" id="d-office">0</div>
+      <div class="sub">متاحة للتأجير</div>
+    </div>
+  </div>
+
+  <!-- إضافة إيراد سريع -->
+  <div class="form-card" style="padding:14px 18px;margin-bottom:20px;">
+    <div style="font-size:14px;font-weight:600;color:#1a3c6e;margin-bottom:12px;">💰 إضافة إيراد سريع</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+      <div class="form-group" style="flex:1;min-width:120px;">
+        <label>المبلغ (ريال)</label>
+        <input type="number" id="dash-income-amount" placeholder="0">
+      </div>
+      <div class="form-group" style="flex:1;min-width:140px;">
+        <label>نوع الإيراد</label>
+        <select id="dash-income-type" style="font-family:inherit;border:1px solid #cdd4e0;border-radius:6px;padding:9px 12px;font-size:13px;">
+          <option value="إيراد تأجير">إيراد تأجير</option>
+          <option value="استلام متأخرات">استلام متأخرات</option>
+          <option value="إيراد آخر">إيراد آخر</option>
+        </select>
+      </div>
+      <div class="form-group" style="flex:1;min-width:120px;">
+        <label>طريقة الاستلام</label>
+        <select id="dash-income-method" style="font-family:inherit;border:1px solid #cdd4e0;border-radius:6px;padding:9px 12px;font-size:13px;">
+          <option value="نقداً">نقداً</option>
+          <option value="بنك">بنك</option>
+        </select>
+      </div>
+      <div class="form-group" style="flex:1;min-width:120px;">
+        <label>التاريخ</label>
+        <input type="date" id="dash-income-date" style="font-family:inherit;border:1px solid #cdd4e0;border-radius:6px;padding:9px 12px;font-size:13px;">
+      </div>
+      <div class="form-group" style="flex:2;min-width:160px;">
+        <label>ملاحظات</label>
+        <input type="text" id="dash-income-notes" placeholder="وصف اختياري...">
+      </div>
+      <button class="btn btn-success" style="flex:0 0 auto;height:38px;" onclick="addDashboardIncome()">➕ إضافة</button>
+    </div>
+    <div id="dash-income-msg" style="margin-top:8px;"></div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="section-title">العقود النشطة (بها متبقٍ)</div>
+      <div class="table-wrap">
+        <table id="dashboard-table">
+          <thead><tr><th>المستأجر</th><th>السيارة</th><th>الأيام</th><th>الإجمالي</th><th>المتبقي</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">حالة السيارات</div>
+      <div class="car-status-row" id="cars-status-chips"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTRACTS LIST -->
+<div class="page" id="page-contracts">
+  <div class="section-title">سجل العقود اليومية</div>
+  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+    <input type="text" id="search-contracts" placeholder="ابحث باسم المستأجر أو السيارة..." style="padding:9px 14px;border:1px solid #cdd4e0;border-radius:7px;font-size:14px;min-width:240px;font-family:inherit;" oninput="renderContracts()">
+    <select id="filter-status" onchange="renderContracts()" style="padding:9px 12px;border:1px solid #cdd4e0;border-radius:7px;font-size:14px;font-family:inherit;">
+      <option value="">كل الحالات</option>
+      <option value="rented">مؤجرة</option>
+      <option value="office">بالمكتب</option>
+      <option value="repair">بالتصليح</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>المستأجر</th><th>الهوية</th><th>الجوال</th><th>السيارة</th><th>اللوحة</th><th>المغادرة</th><th>العودة</th><th>الأيام</th><th>الأجرة/يوم</th><th>الإجمالي</th><th>نقداً</th><th>بنك</th><th>المتبقي</th><th>رقم العقد</th><th>الحالة</th><th>إنهاء</th></tr></thead>
+      <tbody id="contracts-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- NEW CONTRACT -->
+<div class="page" id="page-new-contract">
+  <div class="section-title">إنشاء عقد تأجير جديد</div>
+  <div class="form-card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>اسم المستأجر</label>
+        <input type="text" id="nc-name" placeholder="الاسم الكامل">
+      </div>
+      <div class="form-group">
+        <label>رقم الهوية</label>
+        <input type="text" id="nc-idnum" placeholder="رقم الهوية الوطنية">
+      </div>
+      <div class="form-group">
+        <label>رقم الجوال</label>
+        <input type="tel" id="nc-phone" placeholder="9XXXXXXXX">
+      </div>
+      <div class="form-group">
+        <label>السيارة</label>
+        <select id="nc-car">
+          <option value="">-- اختر السيارة --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>تاريخ المغادرة</label>
+        <input type="date" id="nc-out">
+      </div>
+      <div class="form-group">
+        <label>وقت المغادرة</label>
+        <input type="time" id="nc-out-time" placeholder="00:00">
+      </div>
+      <div class="form-group">
+        <label>تاريخ العودة</label>
+        <input type="date" id="nc-in" oninput="calcNewContract()">
+      </div>
+      <div class="form-group">
+        <label>وقت العودة</label>
+        <input type="time" id="nc-in-time" placeholder="00:00">
+      </div>
+      <div class="form-group">
+        <label>أجرة اليوم (ريال)</label>
+        <input type="number" id="nc-rate" placeholder="0" oninput="calcNewContract()">
+      </div>
+      <div class="form-group">
+        <label>المبلغ المدفوع نقداً</label>
+        <input type="number" id="nc-cash" placeholder="0" oninput="calcNewContract()">
+      </div>
+      <div class="form-group">
+        <label>المبلغ المدفوع بنك</label>
+        <input type="number" id="nc-bank" placeholder="0" oninput="calcNewContract()">
+      </div>
+      <div class="form-group">
+        <label>رقم العقد</label>
+        <input type="number" id="nc-contract-no" placeholder="رقم تلقائي">
+      </div>
+      <div class="form-group" style="align-self:center;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="nc-past" onchange="togglePastContract()" style="width:18px;height:18px;cursor:pointer;">
+          <span>عقد منتهٍ (إضافة رصيد متبقي)</span>
+        </label>
+      </div>
+      <div class="form-group" id="nc-balance-group" style="display:none;">
+        <label>الرصيد المتبقي (ريال)</label>
+        <input type="number" id="nc-balance" placeholder="0" oninput="calcNewContract()">
+      </div>
+    </div>
+
+    <!-- رفع نسخة الهوية -->
+    <div style="margin-top:16px;">
+      <label style="font-size:13px;color:#555;font-weight:500;display:block;margin-bottom:8px;">📎 نسخة من الهوية (صورة)</label>
+      <div class="id-upload-box" id="id-upload-box" onclick="document.getElementById('nc-id-file').click()">
+        <div class="upload-label">🪪 اضغط لرفع صورة الهوية</div>
+        <img id="id-preview" src="" alt="صورة الهوية">
+      </div>
+      <input type="file" id="nc-id-file" accept="image/*" style="display:none" onchange="previewID(this)">
+    </div>
+
+    <div id="calc-result">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:13px;color:#555;margin-bottom:4px;">عدد الأيام</div>
+          <div class="big" id="nc-days">0</div>
+        </div>
+        <div>
+          <div style="font-size:13px;color:#555;margin-bottom:4px;">إجمالي المبلغ</div>
+          <div class="big" id="nc-total">0 ريال</div>
+        </div>
+        <div>
+          <div style="font-size:13px;color:#555;margin-bottom:4px;">المتبقي</div>
+          <div class="big" id="nc-remaining" style="color:#c0392b;">0 ريال</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveContract()">💾 حفظ العقد</button>
+      <button class="btn" style="border:1px solid #cdd4e0;" onclick="clearNewContract()">مسح</button>
+    </div>
+    <div id="contract-msg" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<!-- DAILY REPORT -->
+<div class="page" id="page-daily-report">
+  <div class="section-title">الإيراد والمنصرف اليومي</div>
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap;">
+    <label style="font-size:13px;color:#555;font-weight:500;">اختر التاريخ:</label>
+    <input type="date" id="dr-date" style="padding:9px 14px;border:1px solid #cdd4e0;border-radius:7px;font-size:14px;font-family:inherit;" oninput="renderDailyReport()">
+  </div>
+  <div class="daily-report-grid" id="dr-cards"></div>
+
+  <div class="two-col">
+    <div>
+      <div class="section-title">➕ إضافة إيراد ليوم معين</div>
+      <div class="form-card" style="padding:14px;">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>التاريخ</label>
+            <input type="date" id="dr-add-date" style="font-family:inherit;">
+          </div>
+          <div class="form-group">
+            <label>المبلغ (ريال)</label>
+            <input type="number" id="dr-add-amount" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>نوع الإيراد</label>
+            <select id="dr-add-type" style="font-family:inherit;border:1px solid #cdd4e0;border-radius:6px;padding:9px 12px;font-size:14px;">
+              <option value="إيراد تأجير">إيراد تأجير</option>
+              <option value="استلام متأخرات">استلام متأخرات</option>
+              <option value="إيراد آخر">إيراد آخر</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>طريقة الاستلام</label>
+            <select id="dr-add-method" style="font-family:inherit;border:1px solid #cdd4e0;border-radius:6px;padding:9px 12px;font-size:14px;">
+              <option value="نقداً">نقداً</option>
+              <option value="بنك">بنك</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>ملاحظات</label>
+            <input type="text" id="dr-add-notes" placeholder="وصف...">
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn btn-success" onclick="addDailyIncome()">💰 إضافة إيراد</button>
+        </div>
+        <div id="dr-add-income-msg" style="margin-top:8px;"></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">➖ إضافة منصرف ليوم معين</div>
+      <div class="form-card" style="padding:14px;">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>التاريخ</label>
+            <input type="date" id="dr-exp-date" style="font-family:inherit;">
+          </div>
+          <div class="form-group">
+            <label>المبلغ (ريال)</label>
+            <input type="number" id="dr-exp-amount" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label>النوع</label>
+            <select id="dr-exp-type" style="font-family:inherit;border:1px solid #cdd4e0;border-radius:6px;padding:9px 12px;font-size:14px;">
+              <option value="صيانة">🔧 صيانة</option>
+              <option value="وقود">⛽ وقود</option>
+              <option value="تأمين">🛡 تأمين</option>
+              <option value="غسيل">🚿 غسيل</option>
+              <option value="إيجار مكتب">🏢 إيجار مكتب</option>
+              <option value="رواتب">👤 رواتب</option>
+              <option value="أخرى">📋 أخرى</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>ملاحظات</label>
+            <input type="text" id="dr-exp-notes" placeholder="وصف...">
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top:12px;">
+          <button class="btn btn-danger" onclick="addDailyExpense()">💸 إضافة منصرف</button>
+        </div>
+        <div id="dr-add-exp-msg" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="section-title">عقود هذا اليوم</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>المستأجر</th><th>السيارة</th><th>الأجرة/يوم</th><th>المقبوض</th></tr></thead>
+          <tbody id="dr-contracts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">إيرادات ومصروفات هذا اليوم</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>النوع</th><th>البيان</th><th>المبلغ</th><th>حذف</th></tr></thead>
+          <tbody id="dr-expenses-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TERMINATE MODAL -->
+<div class="modal-overlay" id="terminate-modal">
+  <div class="modal-box">
+    <h3>🔴 إنهاء العقد</h3>
+    <div style="font-size:14px;color:#555;margin-bottom:14px;">
+      المستأجر: <strong id="term-name"></strong><br>
+      السيارة: <strong id="term-car"></strong><br>
+      تاريخ الخروج: <strong id="term-out"></strong><br>
+      الإجمالي: <strong id="term-total"></strong> ريال &nbsp;|&nbsp; المتبقي: <strong id="term-rem" style="color:#c0392b;"></strong> ريال
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>تاريخ إنهاء العقد</label>
+        <input type="date" id="term-date">
+      </div>
+      <div class="form-group">
+        <label>وقت العودة الفعلي</label>
+        <input type="time" id="term-time">
+      </div>
+      <div class="form-group">
+        <label>مبلغ إضافي (إن وجد)</label>
+        <input type="number" id="term-extra" placeholder="0" oninput="calcTerminate()">
+      </div>
+      <div class="form-group">
+        <label>طريقة الدفع</label>
+        <select id="term-method">
+          <option value="cash">نقداً</option>
+          <option value="bank">بنك</option>
+        </select>
+      </div>
+    </div>
+    <div id="term-calc" style="background:#f0f4ff;border:1px solid #c5d0f0;border-radius:8px;padding:12px;margin-top:10px;font-size:14px;display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn terminate-btn" onclick="confirmTerminate()">✅ تأكيد الإنهاء</button>
+      <button class="btn" style="border:1px solid #cdd4e0;" onclick="closeTerminate()">إلغاء</button>
+    </div>
+    <div id="term-msg" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- EXPENSES -->
+<div class="page" id="page-expenses">
+  <div class="section-title">إدخال المصروفات</div>
+  <div class="form-card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>نوع المصروف</label>
+        <div class="expense-types">
+          <button class="expense-type-btn selected" onclick="selectExpType(this,'صيانة')">🔧 صيانة</button>
+          <button class="expense-type-btn" onclick="selectExpType(this,'وقود')">⛽ وقود</button>
+          <button class="expense-type-btn" onclick="selectExpType(this,'تأمين')">🛡 تأمين</button>
+          <button class="expense-type-btn" onclick="selectExpType(this,'غسيل')">🚿 غسيل</button>
+          <button class="expense-type-btn" onclick="selectExpType(this,'إيجار مكتب')">🏢 إيجار مكتب</button>
+          <button class="expense-type-btn" onclick="selectExpType(this,'رواتب')">👤 رواتب</button>
+          <button class="expense-type-btn" onclick="selectExpType(this,'أخرى')">📋 أخرى</button>
+        </div>
+      </div>
+      <div class="form-group" style="align-self:start;">
+        <label>المبلغ (ريال)</label>
+        <input type="number" id="exp-amount" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>السيارة (اختياري)</label>
+        <select id="exp-car">
+          <option value="عام">عام (غير مرتبط بسيارة)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>التاريخ</label>
+        <input type="date" id="exp-date">
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label>ملاحظات</label>
+        <input type="text" id="exp-notes" placeholder="وصف إضافي...">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger" onclick="saveExpense()">💸 تسجيل المصروف</button>
+    </div>
+    <div id="exp-msg" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="section-title">سجل المصروفات</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>التاريخ</th><th>النوع</th><th>السيارة</th><th>المبلغ</th><th>ملاحظات</th><th>حذف</th></tr></thead>
+      <tbody id="expenses-tbody"></tbody>
+    </table>
+  </div>
+  <div class="summary-box" style="margin-top:16px;">
+    <div class="row"><span>إجمالي المصروفات</span><span id="total-exp-display">0 ريال</span></div>
+  </div>
+</div>
+
+<!-- CARS -->
+<div class="page" id="page-cars">
+  <div class="section-title">إدارة السيارات</div>
+
+  <div id="expiry-alerts" style="margin-bottom:16px;"></div>
+
+  <div class="form-card">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:#1a3c6e;">إضافة سيارة جديدة</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>نوع السيارة</label>
+        <input type="text" id="car-model" placeholder="مثل: النترا، أكورد...">
+      </div>
+      <div class="form-group">
+        <label>رقم اللوحة</label>
+        <input type="number" id="car-plate" placeholder="رقم اللوحة">
+      </div>
+      <div class="form-group">
+        <label>أجرة اليوم الافتراضية</label>
+        <input type="number" id="car-rate" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>رقم السيارة</label>
+        <input type="number" id="car-num" placeholder="رقم تسلسلي">
+      </div>
+      <div class="form-group">
+        <label>📅 تاريخ انتهاء التأمين</label>
+        <input type="date" id="car-insurance">
+      </div>
+      <div class="form-group">
+        <label>📅 تاريخ انتهاء الترخيص</label>
+        <input type="date" id="car-license">
+      </div>
+      <div class="form-group">
+        <label>📅 تاريخ انتهاء البطاقة التشغيلية</label>
+        <input type="date" id="car-opcard">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveCar()">➕ إضافة السيارة</button>
+    </div>
+    <div id="car-msg" style="margin-top:10px;"></div>
+  </div>
+
+  <div id="edit-car-form" style="display:none;" class="form-card">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:#d35400;">✏️ تعديل بيانات السيارة</h3>
+    <input type="hidden" id="edit-car-plate-orig">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>تاريخ انتهاء التأمين</label>
+        <input type="date" id="edit-car-insurance">
+      </div>
+      <div class="form-group">
+        <label>تاريخ انتهاء الترخيص</label>
+        <input type="date" id="edit-car-license">
+      </div>
+      <div class="form-group">
+        <label>تاريخ انتهاء البطاقة التشغيلية</label>
+        <input type="date" id="edit-car-opcard">
+      </div>
+      <div class="form-group">
+        <label>أجرة اليوم</label>
+        <input type="number" id="edit-car-rate">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-success" onclick="saveEditCar()">💾 حفظ التعديلات</button>
+      <button class="btn" style="border:1px solid #cdd4e0;" onclick="document.getElementById('edit-car-form').style.display='none'">إلغاء</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>النوع</th><th>اللوحة</th><th>الأجرة/يوم</th><th>الحالة</th><th>التأمين</th><th>الترخيص</th><th>البطاقة التشغيلية</th><th>إجمالي الإيراد</th><th>تعديل</th><th>حذف</th></tr></thead>
+      <tbody id="cars-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CALCULATOR -->
+<div class="page" id="page-calculator">
+  <div class="section-title">حاسبة أجرة التأجير</div>
+  <div class="form-card" style="max-width:500px;">
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>تاريخ الخروج</label>
+      <input type="date" id="calc-out" oninput="updateCalc()">
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>تاريخ العودة</label>
+      <input type="date" id="calc-in" oninput="updateCalc()">
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>أجرة اليوم (ريال)</label>
+      <input type="number" id="calc-rate" placeholder="8" oninput="updateCalc()">
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>المبلغ المدفوع</label>
+      <input type="number" id="calc-paid" placeholder="0" oninput="updateCalc()">
+    </div>
+    <div class="summary-box" id="calc-box" style="display:none;">
+      <div class="row"><span>عدد الأيام</span><span id="calc-d">0</span></div>
+      <div class="row"><span>إجمالي الأجرة</span><span id="calc-t">0 ريال</span></div>
+      <div class="row total"><span>المبلغ المتبقي</span><span id="calc-r" style="color:#c0392b;">0 ريال</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DEBTS -->
+<div class="page" id="page-debts">
+  <div class="section-title">المديونيات والمبالغ المتبقية</div>
+  <div class="cards-grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:20px;">
+    <div class="metric-card orange">
+      <div class="label">مديونيات منتهية</div>
+      <div class="value" id="debt-total">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card" style="border-right:4px solid #c0392b;">
+      <div class="label">متبقي عقود نشطة</div>
+      <div class="value" id="debt-active-total" style="color:#c0392b;">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card" style="border-right:4px solid #7b1fa2;">
+      <div class="label">إجمالي المتبقيات</div>
+      <div class="value" id="debt-grand-total" style="color:#7b1fa2;">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">عدد المدينين</div>
+      <div class="value" id="debt-count">0</div>
+      <div class="sub">مستأجر</div>
+    </div>
+  </div>
+
+  <!-- تبويبات -->
+  <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid #e0e6f0;">
+    <button id="debt-tab-expired" onclick="switchDebtTab('expired')" style="padding:10px 20px;border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;color:#1a3c6e;border-bottom:3px solid #1a3c6e;cursor:pointer;margin-bottom:-2px;">عقود منتهية بمتبقيات</button>
+    <button id="debt-tab-active" onclick="switchDebtTab('active')" style="padding:10px 20px;border:none;background:none;font-family:inherit;font-size:14px;color:#888;border-bottom:3px solid transparent;cursor:pointer;margin-bottom:-2px;">عقود نشطة بمتبقيات</button>
+  </div>
+
+  <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+    <input type="text" id="search-debts" placeholder="ابحث باسم المستأجر..." style="padding:9px 14px;border:1px solid #cdd4e0;border-radius:7px;font-size:14px;min-width:220px;font-family:inherit;" oninput="renderDebts()">
+  </div>
+
+  <!-- جدول المنتهية -->
+  <div id="debt-panel-expired">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>المستأجر</th><th>السيارة</th><th>تاريخ الخروج</th><th>تاريخ العودة</th><th>الأيام</th><th>إجمالي العقد</th><th>المدفوع</th><th>المتبقي (دين)</th><th>رقم العقد</th><th>تسوية</th></tr></thead>
+        <tbody id="debts-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- جدول النشطة -->
+  <div id="debt-panel-active" style="display:none;">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>المستأجر</th><th>الجوال</th><th>السيارة</th><th>تاريخ الخروج</th><th>تاريخ العودة</th><th>الأيام</th><th>إجمالي العقد</th><th>المدفوع</th><th>المتبقي</th><th>رقم العقد</th><th>إنهاء</th></tr></thead>
+        <tbody id="debts-active-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="settle-form" style="display:none;margin-top:20px;" class="form-card">
+    <h3 style="font-size:15px;font-weight:600;color:#1a3c6e;margin-bottom:14px;">تسوية مديونية</h3>
+    <div style="font-size:14px;color:#555;margin-bottom:12px;">المستأجر: <strong id="settle-name"></strong> | المتبقي: <strong id="settle-rem" style="color:#c0392b;"></strong> ريال</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>المبلغ المُسدَّد</label>
+        <input type="number" id="settle-amount" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>طريقة الدفع</label>
+        <select id="settle-method">
+          <option value="cash">نقداً</option>
+          <option value="bank">بنك</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-success" onclick="settleDebt()">✅ تسجيل السداد</button>
+      <button class="btn" style="border:1px solid #cdd4e0;" onclick="document.getElementById('settle-form').style.display='none'">إلغاء</button>
+    </div>
+    <div id="settle-msg" style="margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div class="page" id="page-reports">
+  <div class="section-title">تقرير الإيرادات والمصروفات</div>
+  <div class="cards-grid">
+    <div class="metric-card green">
+      <div class="label">إجمالي الإيرادات</div>
+      <div class="value" id="r-revenue">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card red">
+      <div class="label">إجمالي المصروفات</div>
+      <div class="value" id="r-expenses">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">صافي الربح</div>
+      <div class="value" id="r-profit">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+    <div class="metric-card orange">
+      <div class="label">إجمالي المتبقي</div>
+      <div class="value" id="r-pending">0</div>
+      <div class="sub">ريال عماني</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="section-title">تفصيل المصروفات حسب النوع</div>
+      <table>
+        <thead><tr><th>النوع</th><th>المبلغ</th><th>النسبة</th></tr></thead>
+        <tbody id="exp-by-type"></tbody>
+      </table>
+    </div>
+    <div>
+      <div class="section-title">أداء السيارات</div>
+      <table>
+        <thead><tr><th>السيارة</th><th>اللوحة</th><th>إجمالي الإيراد</th><th>عدد العقود</th></tr></thead>
+        <tbody id="car-performance"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:28px;">المستأجرون الدائمون</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>المستأجر</th><th>عدد العقود</th><th>إجمالي الأيام</th><th>إجمالي المدفوع</th></tr></thead>
+      <tbody id="top-customers"></tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:20px;">
+    <button class="btn btn-primary" onclick="window.print()">🖨 طباعة التقرير</button>
+  </div>
+</div>
+
+<script>
+const DAYS_OFFSET = 25569;
+function excelDateToJS(n) {
+  const ms = (n - DAYS_OFFSET) * 86400 * 1000;
+  return new Date(ms);
+}
+function formatDate(d) {
+  if (!d) return '';
+  const dt = d instanceof Date ? d : new Date(d);
+  return dt.toLocaleDateString('ar-EG', {year:'numeric',month:'2-digit',day:'2-digit'});
+}
+function today() { return new Date().toISOString().split('T')[0]; }
+
+const CARS_KEY = 'rct_cars';
+const CONTRACTS_KEY = 'rct_contracts';
+const EXPENSES_KEY = 'rct_expenses';
+const DAILY_KEY = 'rct_daily_entries';
+
+// saveData سيُستبدل لاحقاً بنسخة Firebase — هذه نسخة احتياطية محلية
+function loadData(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
+}
+// saveData: تُستبدل بنسخة Firebase عند التحميل
+window.saveData = function(key, data) { localStorage.setItem(key, JSON.stringify(data)); };
+
+let cars         = loadData(CARS_KEY);
+let contracts    = loadData(CONTRACTS_KEY);
+let expenses     = loadData(EXPENSES_KEY);
+let dailyEntries = loadData(DAILY_KEY);
+
+// مسح العقود القديمة المُدخلة مسبقاً إن وُجدت (تعريفها: id رقمي صغير ≤ 10)
+if (contracts.length && contracts.every(c => typeof c.id === 'number' && c.id <= 10)) {
+  contracts = [];
+  saveData(CONTRACTS_KEY, contracts);
+}
+
+if (!cars.length) {
+  cars = [
+    {id:1, model:'النترا', plate:3202, rate:8},
+    {id:2, model:'النترا', plate:7375, rate:8},
+    {id:3, model:'أكورد', plate:7132, rate:8},
+    {id:4, model:'النترا', plate:8324, rate:8},
+    {id:5, model:'النترا', plate:7543, rate:8},
+    {id:6, model:'النترا', plate:9674, rate:8},
+    {id:7, model:'النترا', plate:1123, rate:8},
+    {id:8, model:'النترا', plate:1936, rate:8},
+    {id:9, model:'النترا', plate:7230, rate:9},
+    {id:10, model:'النترا', plate:8937, rate:9},
+    {id:11, model:'التيما', plate:7670, rate:9},
+    {id:12, model:'أكورد', plate:6999, rate:10},
+    {id:13, model:'سنتافي', plate:6620, rate:10},
+    {id:14, model:'رافور', plate:7561, rate:12},
+    {id:15, model:'النترا', plate:1186, rate:8},
+    {id:16, model:'أكسنت', plate:9738, rate:9},
+    {id:17, model:'أرمادا', plate:2466, rate:30},
+    {id:18, model:'أكورد', plate:1289, rate:10},
+    {id:19, model:'النترا', plate:9174, rate:8},
+  ];
+  saveData(CARS_KEY, cars);
+}
+
+// عقد منتهٍ: انتهى تاريخه أو أُنهي يدوياً
+function isExpired(c) {
+  if (c.terminated) return true;
+  if (!c.inDate) return false;
+  return new Date(c.inDate) < new Date(new Date().toISOString().split('T')[0]);
+}
+// عقد نشط: لم ينتهِ بعد
+function isActive(c) { return !isExpired(c); }
+// مديون: انتهى وعنده متبقي
+function isDebt(c) { return isExpired(c) && (c.remaining||0) > 0; }
+
+let selectedExpType = 'صيانة';
+function selectExpType(btn, type) {
+  selectedExpType = type;
+  document.querySelectorAll('.expense-type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button, .mobile-nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  // تفعيل زر القائمة المناسب في كلا التنقّلين
+  document.querySelectorAll('nav button, .mobile-nav button').forEach(b => {
+    if (b.getAttribute('onclick') === "showPage('" + id + "')") b.classList.add('active');
+  });
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'contracts') renderContracts();
+  if (id === 'cars') renderCars();
+  if (id === 'expenses') renderExpenses();
+  if (id === 'debts') renderDebts();
+  if (id === 'reports') renderReports();
+  if (id === 'new-contract') populateCarSelect('nc-car');
+  if (id === 'daily-report') renderDailyReport();
+}
+
+function getCarByPlate(plate) { return cars.find(c => c.plate == plate); }
+function getCarStatus(plate) {
+  if (plate == 1289) return 'repair';
+  // سيارة مؤجرة = عندها عقد نشط (لم ينته بعد)
+  const activeContract = contracts.find(c => c.carPlate == plate && isActive(c));
+  if (activeContract) return 'rented';
+  return 'office';
+}
+
+function statusBadge(s) {
+  if (s === 'rented') return '<span class="badge rented">مؤجرة</span>';
+  if (s === 'repair') return '<span class="badge repair">بالتصليح</span>';
+  return '<span class="badge office">بالمكتب</span>';
+}
+
+function renderDashboard() {
+  const activeContracts = contracts.filter(isActive);
+  const debtContracts = contracts.filter(isDebt);
+
+  const contractRevenue = contracts.reduce((s,c) => s + (c.cash||0) + (c.bank||0), 0);
+  const manualIncome = dailyEntries.filter(e => e.kind === 'income').reduce((s,e) => s + (e.amount||0), 0);
+  const totalRevenue = contractRevenue + manualIncome;
+
+  const contractExp = expenses.reduce((s,e) => s + (e.amount||0), 0);
+  const manualExp = dailyEntries.filter(e => e.kind === 'expense').reduce((s,e) => s + (e.amount||0), 0);
+  const totalExp = contractExp + manualExp;
+
+  // متبقي منتهية + متبقي نشطة
+  const expiredDebt = debtContracts.reduce((s,c) => s + (c.remaining||0), 0);
+  const activePending = activeContracts.filter(c => (c.remaining||0) > 0).reduce((s,c) => s + (c.remaining||0), 0);
+  const totalPending = expiredDebt + activePending;
+
+  const officeCars = cars.filter(c => getCarStatus(c.plate) === 'office').length;
+
+  document.getElementById('d-revenue').textContent = totalRevenue.toFixed(1);
+  document.getElementById('d-manual-income').textContent = manualIncome.toFixed(1);
+  document.getElementById('d-expenses').textContent = totalExp.toFixed(1);
+  document.getElementById('d-profit').textContent = (totalRevenue - totalExp).toFixed(1);
+  document.getElementById('d-pending').textContent = totalPending.toFixed(1);
+  document.getElementById('d-active-pending').textContent = activePending.toFixed(1);
+  document.getElementById('d-active').textContent = activeContracts.length;
+  document.getElementById('d-office').textContent = officeCars;
+
+  // جدول العقود النشطة التي فيها متبقٍ
+  const tbody = document.querySelector('#dashboard-table tbody');
+  const withPending = [...activeContracts].filter(c => (c.remaining||0) > 0).sort((a,b) => (b.remaining||0)-(a.remaining||0));
+  tbody.innerHTML = withPending.length ? withPending.map(c => `
+    <tr>
+      <td>${c.name}<br><span style="font-size:11px;color:#888;">${c.phone||''}</span></td>
+      <td>${(getCarByPlate(c.carPlate)||{}).model||''} ${c.carPlate}</td>
+      <td>${c.days}</td>
+      <td>${(c.total||0).toFixed(1)}</td>
+      <td style="color:#c0392b;font-weight:700;">${(c.remaining||0).toFixed(1)}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="5" style="color:#2e7d32;padding:16px;">✅ لا توجد مبالغ متبقية في العقود النشطة</td></tr>';
+
+  const chips = document.getElementById('cars-status-chips');
+  chips.innerHTML = cars.map(car => {
+    const st = getCarStatus(car.plate);
+    const hasAlert = ['insurance','license','opcard'].some(k => ['expired','soon'].includes(expiryStatus(car[k])));
+    return `<div class="car-chip" style="${hasAlert?'border-color:#f57f17;':''}">
+      <div class="car-name">${car.model}${hasAlert?' ⚠️':''}</div>
+      <div class="car-plate">${car.plate}</div>
+      <div class="car-st">${statusBadge(st)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderContracts() {
+  const search = (document.getElementById('search-contracts').value||'').toLowerCase();
+  const statusF = document.getElementById('filter-status').value;
+  let data = contracts;
+  if (search) data = data.filter(c => c.name.includes(search) || String(c.carPlate).includes(search));
+  if (statusF === 'rented') data = data.filter(isActive);
+  else if (statusF === 'office') data = data.filter(c => isExpired(c) && !(c.remaining > 0));
+  else if (statusF === 'repair') data = data.filter(c => c.carPlate == 1289);
+  const tbody = document.getElementById('contracts-tbody');
+  tbody.innerHTML = data.length ? data.map((c,i) => {
+    const expired = isExpired(c);
+    const hasDebt = isDebt(c);
+    let badge = expired
+      ? (hasDebt ? '<span class="badge debt">منتهية - مديونية</span>' : '<span class="badge office">منتهية</span>')
+      : '<span class="badge rented">نشطة</span>';
+    const outLabel = c.outDate + (c.outTime ? ' ' + c.outTime : '');
+    const inLabel = c.inDate + (c.inTime ? ' ' + c.inTime : '');
+    const terminateBtn = (!expired && !c.terminated) ? `<button class="btn btn-sm terminate-btn" onclick="openTerminate(${c.id})">إنهاء</button>` : '<span style="color:#aaa;font-size:12px;">—</span>';
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${c.name}${c.idImage?'<br><a href="'+c.idImage+'" target="_blank" style="font-size:11px;color:#1a3c6e;">🪪 هوية</a>':''}</td>
+      <td style="font-size:12px;">${c.idNum||'—'}</td>
+      <td style="font-size:12px;">${c.phone||'—'}</td>
+      <td>${(getCarByPlate(c.carPlate)||{}).model||''}</td>
+      <td>${c.carPlate}</td>
+      <td style="font-size:12px;">${outLabel}</td>
+      <td style="font-size:12px;">${inLabel}</td>
+      <td>${c.days||0}</td>
+      <td>${c.rate||0}</td>
+      <td>${c.total||0}</td>
+      <td>${c.cash||0}</td>
+      <td>${c.bank||0}</td>
+      <td style="color:${(c.remaining||0)>0?'#c0392b':'#2e7d32'};font-weight:600;">${c.remaining||0}</td>
+      <td>${c.contractNo||''}</td>
+      <td>${badge}</td>
+      <td>${terminateBtn}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="17" style="color:#aaa;padding:16px;">لا توجد عقود</td></tr>';
+}
+
+function populateCarSelect(id) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">-- اختر السيارة --</option>' +
+    cars.map(c => `<option value="${c.plate}">${c.model} - ${c.plate} (${c.rate} ريال/يوم)</option>`).join('');
+  if (cur) sel.value = cur;
+}
+
+function togglePastContract() {
+  const isPast = document.getElementById('nc-past').checked;
+  document.getElementById('nc-balance-group').style.display = isPast ? 'block' : 'none';
+  if (!isPast) document.getElementById('nc-balance').value = '';
+  calcNewContract();
+}
+
+function calcNewContract() {
+  const out = document.getElementById('nc-out').value;
+  const inn = document.getElementById('nc-in').value;
+  const rate = parseFloat(document.getElementById('nc-rate').value) || 0;
+  const cash = parseFloat(document.getElementById('nc-cash').value) || 0;
+  const bank = parseFloat(document.getElementById('nc-bank').value) || 0;
+  const isPast = document.getElementById('nc-past').checked;
+  const manualBalance = isPast ? (parseFloat(document.getElementById('nc-balance').value) || 0) : null;
+  if (!out || !inn || !rate) { document.getElementById('calc-result').style.display = 'none'; return; }
+  const days = Math.ceil((new Date(inn) - new Date(out)) / 86400000);
+  if (days <= 0) { document.getElementById('calc-result').style.display = 'none'; return; }
+  const total = days * rate;
+  const remaining = manualBalance !== null ? manualBalance : (total - cash - bank);
+  document.getElementById('nc-days').textContent = days;
+  document.getElementById('nc-total').textContent = total.toFixed(1) + ' ريال';
+  document.getElementById('nc-remaining').textContent = remaining.toFixed(1) + ' ريال';
+  document.getElementById('calc-result').style.display = 'block';
+}
+
+function saveContract() {
+  const name = document.getElementById('nc-name').value.trim();
+  const idNum = document.getElementById('nc-idnum').value.trim();
+  const phone = document.getElementById('nc-phone').value.trim();
+  const plate = document.getElementById('nc-car').value;
+  const out = document.getElementById('nc-out').value;
+  const outTime = document.getElementById('nc-out-time').value;
+  const inn = document.getElementById('nc-in').value;
+  const inTime = document.getElementById('nc-in-time').value;
+  const rate = parseFloat(document.getElementById('nc-rate').value) || 0;
+  const cash = parseFloat(document.getElementById('nc-cash').value) || 0;
+  const bank = parseFloat(document.getElementById('nc-bank').value) || 0;
+  const cno = parseInt(document.getElementById('nc-contract-no').value) || (900 + contracts.length);
+  const idImage = document.getElementById('id-preview').src && document.getElementById('id-upload-box').classList.contains('has-img') ? document.getElementById('id-preview').src : '';
+  const isPast = document.getElementById('nc-past').checked;
+  const manualBalance = isPast ? (parseFloat(document.getElementById('nc-balance').value) || 0) : null;
+  if (!name || !plate || !out || !inn || !rate) {
+    document.getElementById('contract-msg').innerHTML = '<div class="alert alert-warning">يرجى تعبئة جميع الحقول الإلزامية</div>';
+    return;
+  }
+  const days = Math.ceil((new Date(inn) - new Date(out)) / 86400000);
+  const total = days * rate;
+  const remaining = manualBalance !== null ? manualBalance : Math.max(0, total - cash - bank);
+  const contract = {
+    id: Date.now(), name, idNum, phone, idImage,
+    carPlate: parseInt(plate), outDate: out, outTime, inDate: inn, inTime,
+    rate, days, total, cash, bank, contractNo: cno, remaining,
+    terminated: isPast,
+    terminatedAt: isPast ? new Date().toISOString() : null
+  };
+  contracts.push(contract);
+  saveData(CONTRACTS_KEY, contracts);
+  document.getElementById('contract-msg').innerHTML = '<div class="alert alert-success">✅ تم حفظ العقد بنجاح! رقم العقد: ' + cno + (isPast ? ' (منتهٍ)' : '') + '</div>';
+  clearNewContract();
+}
+
+function clearNewContract() {
+  ['nc-name','nc-idnum','nc-phone','nc-out','nc-out-time','nc-in','nc-in-time','nc-rate','nc-cash','nc-bank','nc-contract-no','nc-balance'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('nc-car').selectedIndex = 0;
+  document.getElementById('calc-result').style.display = 'none';
+  document.getElementById('id-preview').src = '';
+  document.getElementById('id-upload-box').classList.remove('has-img');
+  document.getElementById('nc-past').checked = false;
+  document.getElementById('nc-balance-group').style.display = 'none';
+}
+
+function saveExpense() {
+  const amount = parseFloat(document.getElementById('exp-amount').value) || 0;
+  const car = document.getElementById('exp-car').value;
+  const date = document.getElementById('exp-date').value || today();
+  const notes = document.getElementById('exp-notes').value.trim();
+  if (!amount) { document.getElementById('exp-msg').innerHTML = '<div class="alert alert-warning">أدخل المبلغ</div>'; return; }
+  expenses.push({id: Date.now(), type: selectedExpType, amount, car, date, notes});
+  saveData(EXPENSES_KEY, expenses);
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-notes').value = '';
+  document.getElementById('exp-msg').innerHTML = '<div class="alert alert-success">✅ تم تسجيل المصروف</div>';
+  renderExpenses();
+}
+
+function deleteExpense(id) {
+  expenses = expenses.filter(e => e.id !== id);
+  saveData(EXPENSES_KEY, expenses);
+  renderExpenses();
+}
+
+function renderExpenses() {
+  const expCar = document.getElementById('exp-car');
+  expCar.innerHTML = '<option value="عام">عام</option>' + cars.map(c => `<option value="${c.plate}">${c.model} ${c.plate}</option>`).join('');
+
+  const tbody = document.getElementById('expenses-tbody');
+  tbody.innerHTML = expenses.map((e,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td>${e.date}</td>
+      <td>${e.type}</td>
+      <td>${e.car}</td>
+      <td>${e.amount} ريال</td>
+      <td>${e.notes||'-'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})">حذف</button></td>
+    </tr>
+  `).join('');
+  const total = expenses.reduce((s,e) => s + e.amount, 0);
+  document.getElementById('total-exp-display').textContent = total.toFixed(2) + ' ريال';
+}
+
+function saveCar() {
+  const model = document.getElementById('car-model').value.trim();
+  const plate = parseInt(document.getElementById('car-plate').value);
+  const rate = parseFloat(document.getElementById('car-rate').value) || 0;
+  const num = parseInt(document.getElementById('car-num').value) || (cars.length + 1);
+  const insurance = document.getElementById('car-insurance').value;
+  const license = document.getElementById('car-license').value;
+  const opcard = document.getElementById('car-opcard').value;
+  if (!model || !plate) { document.getElementById('car-msg').innerHTML = '<div class="alert alert-warning">يرجى إدخال النوع واللوحة</div>'; return; }
+  cars.push({id: num, model, plate, rate, insurance, license, opcard});
+  saveData(CARS_KEY, cars);
+  document.getElementById('car-msg').innerHTML = '<div class="alert alert-success">✅ تمت إضافة السيارة</div>';
+  ['car-model','car-plate','car-rate','car-num','car-insurance','car-license','car-opcard'].forEach(id => document.getElementById(id).value = '');
+  renderCars();
+}
+
+function deleteCar(plate) {
+  if (!confirm('هل أنت متأكد من حذف هذه السيارة؟')) return;
+  cars = cars.filter(c => c.plate != plate);
+  saveData(CARS_KEY, cars);
+  renderCars();
+}
+
+function openEditCar(plate) {
+  const car = getCarByPlate(plate);
+  if (!car) return;
+  document.getElementById('edit-car-plate-orig').value = plate;
+  document.getElementById('edit-car-insurance').value = car.insurance || '';
+  document.getElementById('edit-car-license').value = car.license || '';
+  document.getElementById('edit-car-opcard').value = car.opcard || '';
+  document.getElementById('edit-car-rate').value = car.rate || '';
+  document.getElementById('edit-car-form').style.display = 'block';
+  document.getElementById('edit-car-form').scrollIntoView({behavior:'smooth'});
+}
+
+function saveEditCar() {
+  const plate = parseInt(document.getElementById('edit-car-plate-orig').value);
+  const idx = cars.findIndex(c => c.plate == plate);
+  if (idx === -1) return;
+  cars[idx].insurance = document.getElementById('edit-car-insurance').value;
+  cars[idx].license = document.getElementById('edit-car-license').value;
+  cars[idx].opcard = document.getElementById('edit-car-opcard').value;
+  cars[idx].rate = parseFloat(document.getElementById('edit-car-rate').value) || cars[idx].rate;
+  saveData(CARS_KEY, cars);
+  document.getElementById('edit-car-form').style.display = 'none';
+  renderCars();
+}
+
+// تحديد حالة التاريخ: منتهٍ / قريب (30 يوم) / سليم
+function expiryStatus(dateStr) {
+  if (!dateStr) return 'none';
+  const diff = Math.ceil((new Date(dateStr) - new Date(today())) / 86400000);
+  if (diff < 0) return 'expired';
+  if (diff <= 30) return 'soon';
+  return 'ok';
+}
+
+function expiryCell(dateStr) {
+  if (!dateStr) return '<span style="color:#bbb;">—</span>';
+  const st = expiryStatus(dateStr);
+  const diff = Math.ceil((new Date(dateStr) - new Date(today())) / 86400000);
+  if (st === 'expired') return `<span style="background:#fce4ec;color:#c62828;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;">منتهي ${dateStr}</span>`;
+  if (st === 'soon') return `<span style="background:#fff8e1;color:#f57f17;padding:3px 8px;border-radius:12px;font-size:12px;font-weight:600;">بعد ${diff} يوم</span>`;
+  return `<span style="color:#2e7d32;font-size:12px;">${dateStr}</span>`;
+}
+
+function renderExpiryAlerts() {
+  const alerts = [];
+  cars.forEach(car => {
+    [{key:'insurance',label:'التأمين'},{key:'license',label:'الترخيص'},{key:'opcard',label:'البطاقة التشغيلية'}].forEach(f => {
+      const st = expiryStatus(car[f.key]);
+      if (st === 'expired') alerts.push(`<div class="alert" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;margin-bottom:6px;">🚨 <strong>${car.model} (${car.plate})</strong> — ${f.label} <strong>منتهي</strong> منذ ${car[f.key]}</div>`);
+      else if (st === 'soon') {
+        const diff = Math.ceil((new Date(car[f.key]) - new Date(today())) / 86400000);
+        alerts.push(`<div class="alert" style="background:#fff8e1;color:#f57f17;border:1px solid #ffe082;margin-bottom:6px;">⚠️ <strong>${car.model} (${car.plate})</strong> — ${f.label} ينتهي بعد <strong>${diff} يوم</strong> (${car[f.key]})</div>`);
+      }
+    });
+  });
+  document.getElementById('expiry-alerts').innerHTML = alerts.join('');
+}
+
+function renderCars() {
+  renderExpiryAlerts();
+  const tbody = document.getElementById('cars-tbody');
+  tbody.innerHTML = cars.map((car,i) => {
+    const st = getCarStatus(car.plate);
+    const income = contracts.filter(c => c.carPlate == car.plate).reduce((s,c) => s + (c.cash||0) + (c.bank||0), 0);
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${car.model}</td>
+      <td>${car.plate}</td>
+      <td>${car.rate}</td>
+      <td>${statusBadge(st)}</td>
+      <td>${expiryCell(car.insurance)}</td>
+      <td>${expiryCell(car.license)}</td>
+      <td>${expiryCell(car.opcard)}</td>
+      <td>${income.toFixed(1)}</td>
+      <td><button class="btn btn-sm" style="border:1px solid #1a3c6e;color:#1a3c6e;" onclick="openEditCar(${car.plate})">تعديل</button></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteCar(${car.plate})">حذف</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function updateCalc() {
+  const out = document.getElementById('calc-out').value;
+  const inn = document.getElementById('calc-in').value;
+  const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+  const paid = parseFloat(document.getElementById('calc-paid').value) || 0;
+  if (!out || !inn || !rate) { document.getElementById('calc-box').style.display='none'; return; }
+  const days = Math.ceil((new Date(inn) - new Date(out)) / 86400000);
+  if (days <= 0) { document.getElementById('calc-box').style.display='none'; return; }
+  const total = days * rate;
+  const remaining = total - paid;
+  document.getElementById('calc-d').textContent = days + ' يوم';
+  document.getElementById('calc-t').textContent = total.toFixed(2) + ' ريال';
+  document.getElementById('calc-r').textContent = remaining.toFixed(2) + ' ريال';
+  document.getElementById('calc-box').style.display = 'block';
+}
+
+let activeDebtTab = 'expired';
+let settlingContractId = null;
+
+function switchDebtTab(tab) {
+  activeDebtTab = tab;
+  document.getElementById('debt-panel-expired').style.display = tab === 'expired' ? 'block' : 'none';
+  document.getElementById('debt-panel-active').style.display = tab === 'active' ? 'block' : 'none';
+  document.getElementById('debt-tab-expired').style.cssText = tab === 'expired'
+    ? 'padding:10px 20px;border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;color:#1a3c6e;border-bottom:3px solid #1a3c6e;cursor:pointer;margin-bottom:-2px;'
+    : 'padding:10px 20px;border:none;background:none;font-family:inherit;font-size:14px;color:#888;border-bottom:3px solid transparent;cursor:pointer;margin-bottom:-2px;';
+  document.getElementById('debt-tab-active').style.cssText = tab === 'active'
+    ? 'padding:10px 20px;border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;color:#c0392b;border-bottom:3px solid #c0392b;cursor:pointer;margin-bottom:-2px;'
+    : 'padding:10px 20px;border:none;background:none;font-family:inherit;font-size:14px;color:#888;border-bottom:3px solid transparent;cursor:pointer;margin-bottom:-2px;';
+}
+
+function renderDebts() {
+  const search = (document.getElementById('search-debts').value||'').toLowerCase();
+
+  // ---- منتهية ----
+  let expired = contracts.filter(isDebt);
+  if (search) expired = expired.filter(c => c.name.includes(search));
+  const expiredTotal = expired.reduce((s,c) => s + (c.remaining||0), 0);
+
+  // ---- نشطة بمتبقيات ----
+  let active = contracts.filter(c => isActive(c) && (c.remaining||0) > 0);
+  if (search) active = active.filter(c => c.name.includes(search));
+  const activeTotal = active.reduce((s,c) => s + (c.remaining||0), 0);
+
+  document.getElementById('debt-total').textContent = expiredTotal.toFixed(2);
+  document.getElementById('debt-active-total').textContent = activeTotal.toFixed(2);
+  document.getElementById('debt-grand-total').textContent = (expiredTotal + activeTotal).toFixed(2);
+  document.getElementById('debt-count').textContent = expired.length + active.length;
+
+  // جدول المنتهية
+  const tbody = document.getElementById('debts-tbody');
+  tbody.innerHTML = expired.length ? expired.map((c,i) => {
+    const paid = (c.cash||0) + (c.bank||0);
+    const rem = c.remaining || 0;
+    const tot = c.total || 0;
+    const pct = tot > 0 ? Math.min(100, Math.round((paid / tot) * 100)) : 0;
+    const bar = `<div style="background:#f0f0f0;border-radius:4px;height:6px;margin-top:4px;overflow:hidden;">
+      <div style="background:#1a7a4a;width:${pct}%;height:100%;border-radius:4px;"></div></div>
+      <div style="font-size:10px;color:#888;margin-top:2px;">مسدَّد ${pct}%</div>`;
+    return `<tr>
+      <td>${i+1}</td>
+      <td style="font-weight:600;">${c.name}<br><span style="font-size:11px;color:#888;">${c.phone||''}</span></td>
+      <td>${(getCarByPlate(c.carPlate)||{}).model||''} ${c.carPlate}</td>
+      <td style="font-size:12px;">${c.outDate||''}</td>
+      <td style="font-size:12px;">${c.inDate||''}</td>
+      <td>${c.days||0}</td>
+      <td style="font-weight:600;">${tot.toFixed(2)}</td>
+      <td style="color:#1a7a4a;font-weight:600;">${paid.toFixed(2)}<br>${bar}</td>
+      <td style="color:#c0392b;font-weight:700;font-size:15px;">${rem.toFixed(2)}<br><span style="font-size:11px;color:#888;">ريال</span></td>
+      <td>${c.contractNo||''}</td>
+      <td><button class="btn btn-success btn-sm" onclick="openSettle(${c.id})">تسوية</button></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="11" style="color:#2e7d32;padding:16px;">✅ لا توجد مديونيات منتهية</td></tr>';
+
+  // جدول النشطة
+  const atbody = document.getElementById('debts-active-tbody');
+  atbody.innerHTML = active.length ? active.map((c,i) => {
+    const paid = (c.cash||0) + (c.bank||0);
+    const rem = c.remaining || 0;
+    const tot = c.total || 0;
+    const pct = tot > 0 ? Math.min(100, Math.round((paid / tot) * 100)) : 0;
+    const bar = `<div style="background:#f0f0f0;border-radius:4px;height:6px;margin-top:4px;overflow:hidden;">
+      <div style="background:#1a7a4a;width:${pct}%;height:100%;border-radius:4px;"></div></div>
+      <div style="font-size:10px;color:#888;margin-top:2px;">مسدَّد ${pct}%</div>`;
+    return `<tr>
+      <td>${i+1}</td>
+      <td style="font-weight:600;">${c.name}</td>
+      <td style="font-size:12px;">${c.phone||'—'}</td>
+      <td>${(getCarByPlate(c.carPlate)||{}).model||''} ${c.carPlate}</td>
+      <td style="font-size:12px;">${c.outDate||''}</td>
+      <td style="font-size:12px;">${c.inDate||''}</td>
+      <td>${c.days||0}</td>
+      <td>${tot.toFixed(2)}</td>
+      <td style="color:#1a7a4a;font-weight:600;">${paid.toFixed(2)}<br>${bar}</td>
+      <td style="color:#c0392b;font-weight:700;">${rem.toFixed(2)}<br><span style="font-size:11px;color:#888;">ريال</span></td>
+      <td>${c.contractNo||''}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn-success btn-sm" onclick="openSettle(${c.id},'active')">تسوية</button>
+        <button class="btn btn-sm terminate-btn" onclick="openTerminate(${c.id})">إنهاء</button>
+      </td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="12" style="color:#2e7d32;padding:16px;">✅ جميع العقود النشطة مسددة بالكامل</td></tr>';
+
+  document.getElementById('settle-form').style.display = 'none';
+}
+
+function addDashboardIncome() {
+  const amount = parseFloat(document.getElementById('dash-income-amount').value) || 0;
+  const type = document.getElementById('dash-income-type').value;
+  const method = document.getElementById('dash-income-method').value;
+  const date = document.getElementById('dash-income-date').value || today();
+  const notes = document.getElementById('dash-income-notes').value.trim();
+  if (!amount) { document.getElementById('dash-income-msg').innerHTML = '<div class="alert alert-warning">أدخل المبلغ</div>'; return; }
+  dailyEntries.push({id: Date.now(), date, kind: 'income', type, method, amount, notes});
+  saveData(DAILY_KEY, dailyEntries);
+  document.getElementById('dash-income-amount').value = '';
+  document.getElementById('dash-income-notes').value = '';
+  document.getElementById('dash-income-msg').innerHTML = '<div class="alert alert-success">✅ تم تسجيل الإيراد بنجاح</div>';
+  setTimeout(() => { document.getElementById('dash-income-msg').innerHTML = ''; renderDashboard(); }, 1000);
+}
+
+function openSettle(id, fromTab) {
+  const c = contracts.find(x => x.id === id);
+  if (!c) return;
+  settlingContractId = id;
+  if (fromTab) { activeDebtTab = fromTab; switchDebtTab(fromTab); }
+  document.getElementById('settle-name').textContent = c.name + ' — ' + ((getCarByPlate(c.carPlate)||{}).model||'') + ' ' + c.carPlate;
+  document.getElementById('settle-rem').textContent = (c.remaining||0).toFixed(2);
+  document.getElementById('settle-amount').value = '';
+  document.getElementById('settle-msg').innerHTML = '';
+  document.getElementById('settle-form').style.display = 'block';
+  document.getElementById('settle-form').scrollIntoView({behavior:'smooth'});
+}
+
+function settleDebt() {
+  const amount = parseFloat(document.getElementById('settle-amount').value) || 0;
+  const method = document.getElementById('settle-method').value;
+  if (!amount || amount <= 0) {
+    document.getElementById('settle-msg').innerHTML = '<div class="alert alert-warning">أدخل المبلغ المُسدَّد</div>';
+    return;
+  }
+  const idx = contracts.findIndex(x => x.id === settlingContractId);
+  if (idx === -1) return;
+  const c = contracts[idx];
+  const paid = Math.min(amount, c.remaining||0);
+  if (method === 'cash') c.cash = (c.cash||0) + paid;
+  else c.bank = (c.bank||0) + paid;
+  c.remaining = Math.max(0, (c.remaining||0) - paid);
+  contracts[idx] = c;
+  saveData(CONTRACTS_KEY, contracts);
+  document.getElementById('settle-msg').innerHTML = `<div class="alert alert-success">✅ تم تسجيل سداد ${paid.toFixed(2)} ريال — المتبقي: ${c.remaining.toFixed(2)} ريال</div>`;
+  setTimeout(() => { renderDebts(); renderDashboard(); switchDebtTab(activeDebtTab); }, 1200);
+}
+
+function renderReports() {
+  const contractRevenue = contracts.reduce((s,c) => s + (c.cash||0) + (c.bank||0), 0);
+  const manualIncome = dailyEntries.filter(e => e.kind === 'income').reduce((s,e) => s + (e.amount||0), 0);
+  const totalRevenue = contractRevenue + manualIncome;
+
+  const contractExp = expenses.reduce((s,e) => s + (e.amount||0), 0);
+  const manualExp = dailyEntries.filter(e => e.kind === 'expense').reduce((s,e) => s + (e.amount||0), 0);
+  const totalExp = contractExp + manualExp;
+
+  const totalDebt = contracts.filter(isDebt).reduce((s,c) => s + (c.remaining||0), 0);
+
+  document.getElementById('r-revenue').textContent = totalRevenue.toFixed(1);
+  document.getElementById('r-expenses').textContent = totalExp.toFixed(1);
+  document.getElementById('r-profit').textContent = (totalRevenue - totalExp).toFixed(1);
+  document.getElementById('r-pending').textContent = totalDebt.toFixed(1);
+
+  const byType = {};
+  expenses.forEach(e => { byType[e.type] = (byType[e.type]||0) + e.amount; });
+  dailyEntries.filter(e => e.kind === 'expense').forEach(e => { byType[e.type] = (byType[e.type]||0) + e.amount; });
+  document.getElementById('exp-by-type').innerHTML = Object.entries(byType).map(([t,a]) => `
+    <tr><td>${t}</td><td>${a.toFixed(2)} ريال</td><td>${totalExp ? ((a/totalExp)*100).toFixed(1)+'%' : '-'}</td></tr>
+  `).join('') || '<tr><td colspan="3" style="color:#aaa;">لا توجد مصروفات</td></tr>';
+
+  const carPerf = {};
+  contracts.forEach(c => {
+    const k = c.carPlate;
+    if (!carPerf[k]) carPerf[k] = {income:0, count:0};
+    carPerf[k].income += (c.cash||0) + (c.bank||0);
+    carPerf[k].count++;
+  });
+  document.getElementById('car-performance').innerHTML = Object.entries(carPerf)
+    .sort((a,b) => b[1].income - a[1].income)
+    .map(([plate, d]) => {
+      const car = getCarByPlate(plate);
+      return `<tr><td>${car ? car.model : plate}</td><td>${plate}</td><td>${d.income.toFixed(1)} ريال</td><td>${d.count}</td></tr>`;
+    }).join('') || '<tr><td colspan="4" style="color:#aaa;">لا توجد بيانات</td></tr>';
+
+  const custMap = {};
+  contracts.forEach(c => {
+    if (!custMap[c.name]) custMap[c.name] = {count:0, days:0, paid:0};
+    custMap[c.name].count++;
+    custMap[c.name].days += c.days||0;
+    custMap[c.name].paid += (c.cash||0) + (c.bank||0);
+  });
+  document.getElementById('top-customers').innerHTML = Object.entries(custMap)
+    .sort((a,b) => b[1].count - a[1].count).slice(0,10)
+    .map(([name, d]) => `<tr><td>${name}</td><td>${d.count}</td><td>${d.days}</td><td>${d.paid.toFixed(1)} ريال</td></tr>`).join('');
+}
+
+function previewID(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById('id-preview');
+    img.src = e.target.result;
+    document.getElementById('id-upload-box').classList.add('has-img');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function renderDailyReport() {
+  const date = document.getElementById('dr-date').value || today();
+  // set the add-forms dates to match
+  const incDate = document.getElementById('dr-add-date');
+  const expDate = document.getElementById('dr-exp-date');
+  if (!incDate.value) incDate.value = date;
+  if (!expDate.value) expDate.value = date;
+
+  const dayContracts = contracts.filter(c => c.outDate <= date && c.inDate >= date && !c.terminated);
+  const dayExpenses = expenses.filter(e => e.date === date);
+  const dayEntries = dailyEntries.filter(e => e.date === date);
+
+  // إجمالي الإيراد: عقود اليوم + إيرادات يدوية
+  const contractIncome = dayContracts.reduce((s,c) => s + ((c.cash||0)+(c.bank||0)), 0);
+  const manualIncome = dayEntries.filter(e => e.kind === 'income').reduce((s,e) => s + (e.amount||0), 0);
+  const totalIncome = contractIncome + manualIncome;
+  const manualExp = dayEntries.filter(e => e.kind === 'expense').reduce((s,e) => s + (e.amount||0), 0);
+  const totalExpDay = dayExpenses.reduce((s,e) => s + (e.amount||0), 0) + manualExp;
+  const netProfit = totalIncome - totalExpDay;
+
+  document.getElementById('dr-cards').innerHTML = `
+    <div class="daily-stat green"><div class="ds-label">إيراد اليوم</div><div class="ds-value">${totalIncome.toFixed(2)}</div><div style="font-size:11px;color:#888;">ريال</div></div>
+    <div class="daily-stat red"><div class="ds-label">منصرف اليوم</div><div class="ds-value">${totalExpDay.toFixed(2)}</div><div style="font-size:11px;color:#888;">ريال</div></div>
+    <div class="daily-stat ${netProfit>=0?'green':'red'}"><div class="ds-label">صافي اليوم</div><div class="ds-value">${netProfit.toFixed(2)}</div><div style="font-size:11px;color:#888;">ريال</div></div>
+    <div class="daily-stat"><div class="ds-label">عقود نشطة</div><div class="ds-value">${dayContracts.length}</div><div style="font-size:11px;color:#888;">عقد</div></div>
+  `;
+
+  document.getElementById('dr-contracts-tbody').innerHTML = dayContracts.length
+    ? dayContracts.map(c => `<tr>
+        <td>${c.name}<br><span style="font-size:11px;color:#888;">${c.phone||''}</span></td>
+        <td>${(getCarByPlate(c.carPlate)||{}).model||''} ${c.carPlate}</td>
+        <td>${c.rate||0} ريال</td>
+        <td style="color:#1a7a4a;font-weight:600;">${((c.cash||0)+(c.bank||0)).toFixed(2)} ريال</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" style="color:#aaa;padding:12px;">لا توجد عقود</td></tr>';
+
+  // دمج المصروفات العادية + اليدوية في جدول واحد
+  const allItems = [
+    ...dayExpenses.map(e => ({label:'منصرف', sub: e.type + (e.car&&e.car!='عام'?' ('+e.car+')':''), amount: e.amount, notes: e.notes||'—', color:'#c0392b', id:'exp_'+e.id, kind:'expense'})),
+    ...dayEntries.map(e => ({label: e.kind==='income'?'إيراد':'منصرف', sub: e.type+(e.method?' - '+e.method:''), amount: e.amount, notes: e.notes||'—', color: e.kind==='income'?'#1a7a4a':'#c0392b', id:'entry_'+e.id, kind:e.kind}))
+  ];
+
+  document.getElementById('dr-expenses-tbody').innerHTML = allItems.length
+    ? allItems.map(item => `<tr>
+        <td><span style="background:${item.kind==='income'?'#e8f5e9':'#fce4ec'};color:${item.color};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${item.label}</span></td>
+        <td>${item.sub}<br><span style="font-size:11px;color:#888;">${item.notes}</span></td>
+        <td style="color:${item.color};font-weight:600;">${Number(item.amount).toFixed(2)} ريال</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteDailyEntry('${item.id}')">حذف</button></td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" style="color:#aaa;padding:12px;">لا توجد قيود</td></tr>';
+}
+
+function addDailyIncome() {
+  const date = document.getElementById('dr-add-date').value || today();
+  const amount = parseFloat(document.getElementById('dr-add-amount').value) || 0;
+  const type = document.getElementById('dr-add-type').value;
+  const method = document.getElementById('dr-add-method').value;
+  const notes = document.getElementById('dr-add-notes').value.trim();
+  if (!amount) { document.getElementById('dr-add-income-msg').innerHTML = '<div class="alert alert-warning">أدخل المبلغ</div>'; return; }
+  dailyEntries.push({id: Date.now(), date, kind: 'income', type, method, amount, notes});
+  saveData(DAILY_KEY, dailyEntries);
+  document.getElementById('dr-add-amount').value = '';
+  document.getElementById('dr-add-notes').value = '';
+  document.getElementById('dr-add-income-msg').innerHTML = '<div class="alert alert-success">✅ تم تسجيل الإيراد</div>';
+  setTimeout(() => { document.getElementById('dr-add-income-msg').innerHTML = ''; renderDailyReport(); }, 1000);
+}
+
+function addDailyExpense() {
+  const date = document.getElementById('dr-exp-date').value || today();
+  const amount = parseFloat(document.getElementById('dr-exp-amount').value) || 0;
+  const type = document.getElementById('dr-exp-type').value;
+  const notes = document.getElementById('dr-exp-notes').value.trim();
+  if (!amount) { document.getElementById('dr-add-exp-msg').innerHTML = '<div class="alert alert-warning">أدخل المبلغ</div>'; return; }
+  dailyEntries.push({id: Date.now(), date, kind: 'expense', type, amount, notes});
+  saveData(DAILY_KEY, dailyEntries);
+  document.getElementById('dr-exp-amount').value = '';
+  document.getElementById('dr-exp-notes').value = '';
+  document.getElementById('dr-add-exp-msg').innerHTML = '<div class="alert alert-success">✅ تم تسجيل المنصرف</div>';
+  setTimeout(() => { document.getElementById('dr-add-exp-msg').innerHTML = ''; renderDailyReport(); }, 1000);
+}
+
+function deleteDailyEntry(id) {
+  if (id.startsWith('exp_')) {
+    const realId = parseInt(id.replace('exp_',''));
+    expenses = expenses.filter(e => e.id !== realId);
+    saveData(EXPENSES_KEY, expenses);
+  } else {
+    const realId = parseInt(id.replace('entry_',''));
+    dailyEntries = dailyEntries.filter(e => e.id !== realId);
+    saveData(DAILY_KEY, dailyEntries);
+  }
+  renderDailyReport();
+}
+
+let terminatingId = null;
+
+function openTerminate(id) {
+  const c = contracts.find(x => x.id === id);
+  if (!c) return;
+  terminatingId = id;
+  document.getElementById('term-name').textContent = c.name;
+  document.getElementById('term-car').textContent = ((getCarByPlate(c.carPlate)||{}).model||'') + ' ' + c.carPlate;
+  document.getElementById('term-out').textContent = c.outDate + (c.outTime ? ' ' + c.outTime : '');
+  document.getElementById('term-total').textContent = (c.total||0).toFixed(2);
+  document.getElementById('term-rem').textContent = (c.remaining||0).toFixed(2);
+  document.getElementById('term-date').value = today();
+  document.getElementById('term-time').value = new Date().toTimeString().slice(0,5);
+  document.getElementById('term-extra').value = '';
+  document.getElementById('term-calc').style.display = 'none';
+  document.getElementById('term-msg').innerHTML = '';
+  document.getElementById('terminate-modal').classList.add('open');
+}
+
+function calcTerminate() {
+  const c = contracts.find(x => x.id === terminatingId);
+  if (!c) return;
+  const extra = parseFloat(document.getElementById('term-extra').value) || 0;
+  const newRem = Math.max(0, (c.remaining||0) - extra);
+  const box = document.getElementById('term-calc');
+  box.innerHTML = `المتبقي قبل: <strong>${(c.remaining||0).toFixed(2)}</strong> ريال &nbsp;|&nbsp; المدفوع الآن: <strong>${extra.toFixed(2)}</strong> ريال &nbsp;|&nbsp; المتبقي بعد: <strong style="color:${newRem>0?'#c0392b':'#1a7a4a'}">${newRem.toFixed(2)}</strong> ريال`;
+  box.style.display = 'block';
+}
+
+function confirmTerminate() {
+  const idx = contracts.findIndex(x => x.id === terminatingId);
+  if (idx === -1) return;
+  const c = contracts[idx];
+  const extra = parseFloat(document.getElementById('term-extra').value) || 0;
+  const method = document.getElementById('term-method').value;
+  const termDate = document.getElementById('term-date').value;
+  const termTime = document.getElementById('term-time').value;
+  if (extra > 0) {
+    if (method === 'cash') c.cash = (c.cash||0) + extra;
+    else c.bank = (c.bank||0) + extra;
+    c.remaining = Math.max(0, (c.remaining||0) - extra);
+  }
+  c.terminated = true;
+  c.inDate = termDate || c.inDate;
+  c.inTime = termTime || c.inTime;
+  c.terminatedAt = new Date().toISOString();
+  contracts[idx] = c;
+  saveData(CONTRACTS_KEY, contracts);
+  document.getElementById('term-msg').innerHTML = '<div class="alert alert-success">✅ تم إنهاء العقد بنجاح</div>';
+  setTimeout(() => { closeTerminate(); renderContracts(); renderDashboard(); }, 1200);
+}
+
+function closeTerminate() {
+  document.getElementById('terminate-modal').classList.remove('open');
+  terminatingId = null;
+}
+
+function initApp() {
+  document.getElementById('header-date').textContent = new Date().toLocaleDateString('ar-EG', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('nc-out').value = today();
+  document.getElementById('exp-date').value = today();
+  document.getElementById('dr-date').value = today();
+  document.getElementById('dr-add-date').value = today();
+  document.getElementById('dr-exp-date').value = today();
+  document.getElementById('dash-income-date').value = today();
+  populateCarSelect('nc-car');
+  renderDashboard();
+  renderDailyReport();
+}
+
+</script>
+
+<!-- Firebase Realtime Database (compat SDK - يعمل بدون import) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD_IZ0wuduOh2IrZKYCEn7ayWRe8UYWpHc",
+  authDomain: "taha-c16b6.firebaseapp.com",
+  databaseURL: "https://taha-c16b6-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "taha-c16b6",
+  storageBucket: "taha-c16b6.firebasestorage.app",
+  messagingSenderId: "954067459671",
+  appId: "1:954067459671:web:759b1b9ffd283576334d12"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ── مفاتيح قاعدة البيانات ──────────────────────────────────────
+const PATHS = {
+  rct_cars:          'cars',
+  rct_contracts:     'contracts',
+  rct_expenses:      'expenses',
+  rct_daily_entries: 'daily_entries'
+};
+
+// ── حفظ البيانات على Firebase ──────────────────────────────────
+window.saveData = function(key, arr) {
+  const path = PATHS[key];
+  if (!path) return;
+  // تحويل المصفوفة إلى كائن بالـ id كمفتاح
+  const obj = {};
+  arr.forEach(item => { obj[String(item.id)] = item; });
+  db.ref(path).set(obj).catch(e => console.error('Save error:', e));
+};
+
+// ── تحميل البيانات وبدء المزامنة اللحظية ─────────────────────
+let loaded = {cars:false, contracts:false, expenses:false, daily_entries:false};
+
+function checkAllLoaded() {
+  if (Object.values(loaded).every(v => v)) {
+    document.getElementById('loading-overlay').style.display = 'none';
+    initApp();
+  }
+}
+
+function listenPath(path, key, setter, renderer) {
+  db.ref(path).on('value', snap => {
+    const val = snap.val();
+    const arr = val ? Object.values(val) : [];
+    setter(arr);
+    if (!loaded[path]) {
+      loaded[path] = true;
+      // رفع البيانات المحلية للسحابة عند أول تشغيل
+      if (arr.length === 0) {
+        const local = loadData(key);
+        if (local.length > 0) {
+          setter(local);
+          window.saveData(key, local);
+        }
+      }
+      checkAllLoaded();
+    } else {
+      try { renderer(); } catch(e) {}
+    }
+  }, err => {
+    console.error('Listen error:', err);
+    if (!loaded[path]) { loaded[path] = true; checkAllLoaded(); }
+  });
+}
+
+// عرض شاشة التحميل
+document.getElementById('loading-overlay').style.display = 'flex';
+
+// بدء المزامنة لكل مجموعة
+listenPath('cars',          CARS_KEY,      arr => { cars = arr; },         () => { renderDashboard(); renderCars(); });
+listenPath('contracts',     CONTRACTS_KEY, arr => { contracts = arr; },    () => { renderDashboard(); renderContracts(); renderDebts(); });
+listenPath('expenses',      EXPENSES_KEY,  arr => { expenses = arr; },     () => { renderDashboard(); renderExpenses(); renderDailyReport(); });
+listenPath('daily_entries', DAILY_KEY,     arr => { dailyEntries = arr; }, () => { renderDashboard(); renderDailyReport(); });
+
+</script>
+</body>
+</html>
