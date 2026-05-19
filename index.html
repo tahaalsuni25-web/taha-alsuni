@@ -1710,92 +1710,89 @@ function initApp() {
   renderDashboard();
   renderDailyReport();
 }
-<!-- Firebase SDKs -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+</script>
+
+<!-- Firebase Realtime Database (compat SDK - يعمل بدون import) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyD_IZ0wuduOh2IrZKYCEn7ayWRe8UYWpHc",
   authDomain: "taha-c16b6.firebaseapp.com",
+  databaseURL: "https://taha-c16b6-default-rtdb.firebaseio.com",
   projectId: "taha-c16b6",
   storageBucket: "taha-c16b6.firebasestorage.app",
   messagingSenderId: "954067459671",
-  appId: "1:954067459671:web:759b1b9ffd283576334d12",
-  measurementId: "G-4QCC3EERJ9"
+  appId: "1:954067459671:web:759b1b9ffd283576334d12"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-// ── مساعدات Firestore ──────────────────────────────────────────
-async function fbLoad(col) {
-  const snap = await getDocs(collection(db, col));
-  return snap.docs.map(d => d.data());
+// ── مفاتيح قاعدة البيانات ──────────────────────────────────────
+const PATHS = {
+  rct_cars:          'cars',
+  rct_contracts:     'contracts',
+  rct_expenses:      'expenses',
+  rct_daily_entries: 'daily_entries'
+};
+
+// ── حفظ البيانات على Firebase ──────────────────────────────────
+window.saveData = function(key, arr) {
+  const path = PATHS[key];
+  if (!path) return;
+  // تحويل المصفوفة إلى كائن بالـ id كمفتاح
+  const obj = {};
+  arr.forEach(item => { obj[String(item.id)] = item; });
+  db.ref(path).set(obj).catch(e => console.error('Save error:', e));
+};
+
+// ── تحميل البيانات وبدء المزامنة اللحظية ─────────────────────
+let loaded = {cars:false, contracts:false, expenses:false, daily_entries:false};
+
+function checkAllLoaded() {
+  if (Object.values(loaded).every(v => v)) {
+    document.getElementById('loading-overlay').style.display = 'none';
+    initApp();
+  }
 }
 
-async function fbSave(col, arr) {
-  const batch = writeBatch(db);
-  // نحذف الكل ثم نعيد الكتابة (مناسب لمصفوفات صغيرة)
-  const snap = await getDocs(collection(db, col));
-  snap.docs.forEach(d => batch.delete(d.ref));
-  arr.forEach(item => {
-    const ref = doc(collection(db, col), String(item.id));
-    batch.set(ref, item);
+function listenPath(path, key, setter, renderer) {
+  db.ref(path).on('value', snap => {
+    const val = snap.val();
+    const arr = val ? Object.values(val) : [];
+    setter(arr);
+    if (!loaded[path]) {
+      loaded[path] = true;
+      // رفع البيانات المحلية للسحابة عند أول تشغيل
+      if (arr.length === 0) {
+        const local = loadData(key);
+        if (local.length > 0) {
+          setter(local);
+          window.saveData(key, local);
+        }
+      }
+      checkAllLoaded();
+    } else {
+      try { renderer(); } catch(e) {}
+    }
+  }, err => {
+    console.error('Listen error:', err);
+    if (!loaded[path]) { loaded[path] = true; checkAllLoaded(); }
   });
-  await batch.commit();
 }
 
-// ── مزامنة لحظية: عند أي تغيير من جهاز آخر نحدّث الواجهة ──────
-function listenCollection(col, setter, renderer) {
-  onSnapshot(collection(db, col), snap => {
-    const data = snap.docs.map(d => d.data());
-    setter(data);
-    renderer();
-  });
-}
-
-// ── عرض شاشة التحميل ──────────────────────────────────────────
+// عرض شاشة التحميل
 document.getElementById('loading-overlay').style.display = 'flex';
 
-// ── تحميل البيانات الأولي ─────────────────────────────────────
-let [fbCars, fbContracts, fbExpenses, fbDaily] = await Promise.all([
-  fbLoad('cars'), fbLoad('contracts'), fbLoad('expenses'), fbLoad('daily_entries')
-]);
+// بدء المزامنة لكل مجموعة
+listenPath('cars',          CARS_KEY,      arr => { cars = arr; },         () => { renderDashboard(); renderCars(); });
+listenPath('contracts',     CONTRACTS_KEY, arr => { contracts = arr; },    () => { renderDashboard(); renderContracts(); renderDebts(); });
+listenPath('expenses',      EXPENSES_KEY,  arr => { expenses = arr; },     () => { renderDashboard(); renderExpenses(); renderDailyReport(); });
+listenPath('daily_entries', DAILY_KEY,     arr => { dailyEntries = arr; }, () => { renderDashboard(); renderDailyReport(); });
 
-// نقل البيانات للمتغيرات العامة
-cars         = fbCars.length         ? fbCars         : cars;
-contracts    = fbContracts.length    ? fbContracts    : contracts;
-expenses     = fbExpenses.length     ? fbExpenses     : expenses;
-dailyEntries = fbDaily.length        ? fbDaily        : dailyEntries;
-
-// إذا كانت السيارات محلية (localStorage) نرفعها للسحابة أول مرة
-if (!fbCars.length && cars.length)         await fbSave('cars',         cars);
-if (!fbContracts.length && contracts.length) await fbSave('contracts', contracts);
-if (!fbExpenses.length && expenses.length)   await fbSave('expenses',   expenses);
-if (!fbDaily.length && dailyEntries.length)  await fbSave('daily_entries', dailyEntries);
-
-// ── تعريف saveData ليحفظ على Firestore ─────────────────────────
-window.saveData = async function(key, arr) {
-  const colMap = {
-    rct_cars: 'cars', rct_contracts: 'contracts',
-    rct_expenses: 'expenses', rct_daily_entries: 'daily_entries'
-  };
-  const col = colMap[key];
-  if (!col) return;
-  await fbSave(col, arr);
-};
-
-// ── مزامنة لحظية ────────────────────────────────────────────────
-listenCollection('cars',         d => { cars = d; },         () => { try{ renderDashboard(); renderCars(); }catch(e){} });
-listenCollection('contracts',    d => { contracts = d; },    () => { try{ renderDashboard(); renderContracts(); renderDebts(); }catch(e){} });
-listenCollection('expenses',     d => { expenses = d; },     () => { try{ renderDashboard(); renderExpenses(); renderDailyReport(); }catch(e){} });
-listenCollection('daily_entries',d => { dailyEntries = d; }, () => { try{ renderDashboard(); renderDailyReport(); }catch(e){} });
-
-// إخفاء شاشة التحميل وتشغيل البرنامج
-document.getElementById('loading-overlay').style.display = 'none';
-initApp();
 </script>
--e 
 </body>
 </html>
